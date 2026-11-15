@@ -1,0 +1,13 @@
+# Servicio web
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30
+# Agente (familia LangChain 1.x); la memoria de conversación usa el checkpointer en memoria de langgraph
+langchain>=1.3,<2
+langchain-core>=1.6,<2
+langgraph>=1.2,<2
+langchain-anthropic>=1.7,<2
+# Protocolo A2A (servidor)
+a2a-sdk[http-server]>=1.2,<2
+httpx>=0.27
+pydantic>=2.7,<3
+python-dotenv>=1.0
