@@ -48,8 +48,9 @@ class AgenteExecutor(AgentExecutor):
 def construir_card(a: AgenteDef, rpc_path: str) -> AgentCard:
     return AgentCard(
         name=a.id,
-        description=a.descripcion + " Acceso: enviar la clave en la cabecera X-API-Key. Envíe texto en español; use un "
-                                    "contextId fijo por conversación para que recuerde el contexto.",
+        description=a.descripcion + "\nCÓMO CONSULTARME: mensaje de texto en español por A2A message/send, con la clave en "
+                                    "la cabecera X-API-Key. Use un contextId fijo por conversación para que recuerde el "
+                                    "contexto; conversaciones distintas no se mezclan.",
         version="2.0.0",
         documentation_url=f"{config.URL_PUBLICA}/docs",
         provider=AgentProvider(organization=f"{a.autor} · Taller Agentic AI", url=config.URL_PUBLICA),
