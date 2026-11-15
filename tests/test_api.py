@@ -105,3 +105,8 @@ def test_ficha_visual_publica_sin_secretos():
     assert r.status_code == 200 and "text/html" in r.headers["content-type"]
     assert "Qué NO hace" in r.text and "consultar_cmf" in r.text and "/.well-known/agent-card.json" in r.text
     assert "clave-de-prueba" not in r.text and "sk-ant" not in r.text
+
+
+def test_swagger_rosado_publico():
+    r = client.get("/docs")
+    assert r.status_code == 200 and "ale-banner" in r.text and "#be3a6e" in r.text

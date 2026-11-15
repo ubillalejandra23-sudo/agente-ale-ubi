@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 
 from a2a.server.routes import fastapi_routes
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
@@ -19,6 +20,7 @@ from app import config
 from app.a2a_server import es_ruta_rpc, rutas_a2a
 from app.agentes.registro import construir_agentes, responder
 from app.ficha import pagina
+from app.swagger_rosado import BANNER, CSS, FAVICON
 from app.security import clave_valida, exigir_clave, extraer_clave
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -92,6 +94,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
+    docs_url=None,          # /docs se sirve más abajo con la paleta rosada
     title="agente-ale-ubi · Auditoría CMF/SII",
     version="3.0.0",
     summary="Agente A2A autónomo de auditoría, con ficha pública, /salud y acceso por clave",
@@ -151,3 +154,17 @@ async def chat(body: ChatIn):
 
 
 fastapi_routes.add_a2a_routes_to_fastapi(app, agent_card_routes=cards, jsonrpc_routes=rpc)
+
+
+@app.get("/docs", include_in_schema=False)
+async def swagger_rosado():
+    """Swagger UI con la identidad rosada del agente (misma paleta que la ficha visual)."""
+    base = get_swagger_ui_html(
+        openapi_url=app.openapi_url, title="agente-ale-ubi · API", oauth2_redirect_url=None, swagger_favicon_url=FAVICON,
+        swagger_ui_parameters={"docExpansion": "list", "displayRequestDuration": True, "tryItOutEnabled": True,
+                               "defaultModelsExpandDepth": 0, "persistAuthorization": True})
+    html = base.body.decode()
+    html = html.replace("</head>", '<meta name="viewport" content="width=device-width, initial-scale=1">'
+                                   f"<style>{CSS}</style></head>", 1)
+    html = html.replace('<div id="swagger-ui">', BANNER + '<div id="swagger-ui">', 1)
+    return HTMLResponse(html)
