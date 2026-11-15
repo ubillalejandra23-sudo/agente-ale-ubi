@@ -1,5 +1,6 @@
-"""mi-agente (Alejandra · auditoría CMF/SII): un agente A2A autónomo sobre FastAPI. Swagger en `/docs`.
+"""agente-ale-ubi (Alejandra · auditoría CMF/SII): un agente A2A autónomo sobre FastAPI. Swagger en `/docs`.
 
+  GET  /                               ficha visual del agente (pública)
   GET  /salud                          estado del servicio (público)
   GET  /.well-known/agent-card.json    ficha A2A (pública)
   POST /a2a                            A2A message/send (protegido con X-API-Key)
@@ -11,12 +12,13 @@ from contextlib import asynccontextmanager
 
 from a2a.server.routes import fastapi_routes
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from app import config
 from app.a2a_server import es_ruta_rpc, rutas_a2a
 from app.agentes.registro import construir_agentes, responder
+from app.ficha import pagina
 from app.security import clave_valida, exigir_clave, extraer_clave
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -44,7 +46,7 @@ class ChatOut(BaseModel):
 
 class SaludOut(BaseModel):
     status: str = Field(..., examples=["ok"])
-    agente: str = Field(..., examples=["mi-agente"])
+    agente: str = Field(..., examples=["agente-ale-ubi"])
     acceso_configurado: bool = Field(..., description="False si el servidor no tiene API_KEYS (rechazará todo con 503).")
     url_publica: str = Field(..., description="Dirección que publica la ficha del agente (URL_PUBLICA).")
 
@@ -54,7 +56,7 @@ class ErrorOut(BaseModel):
 
 
 DESCRIPCION = """
-## mi-agente · Auditoría de cumplimiento normativo y tributario (CMF y SII)
+## agente-ale-ubi · Auditoría de cumplimiento normativo y tributario (CMF y SII)
 
 Agente de IA **autónomo** que se publica como servicio **A2A**: un coordinador (u otro agente) lee su ficha y le pasa
 las preguntas de su especialidad.
@@ -90,7 +92,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
-    title="mi-agente · Auditoría CMF/SII",
+    title="agente-ale-ubi · Auditoría CMF/SII",
     version="3.0.0",
     summary="Agente A2A autónomo de auditoría, con ficha pública, /salud y acceso por clave",
     description=DESCRIPCION, openapi_tags=TAGS, contact={"name": "Alejandra Ubilla"},
@@ -111,6 +113,12 @@ async def proteger_a2a(request: Request, call_next):
                                 headers={"WWW-Authenticate": "Bearer"})
         log.info("A2A recibido rid=%s", request.headers.get("x-request-id", "-"))
     return await call_next(request)
+
+
+@app.get("/", include_in_schema=False, response_class=HTMLResponse)
+async def ficha_visual():
+    """Ficha visual pública (presentación). La ficha A2A para máquinas es /.well-known/agent-card.json."""
+    return pagina()
 
 
 @app.get("/salud", tags=["Estado"], response_model=SaludOut, summary="Estado del servicio",

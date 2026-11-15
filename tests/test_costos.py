@@ -85,8 +85,8 @@ def test_una_respuesta_truncada_se_avisa_en_los_especialistas(monkeypatch):
         async def ainvoke(self, entrada, cfg):
             return {"messages": [HumanMessage(content="q"),
                                  AIMessage(content="La concentración es 35% y el límite", response_metadata={"stop_reason": "max_tokens"})]}
-    monkeypatch.setattr(registro.AGENTES["mi-agente"], "grafo", Grafo())
-    t = asyncio.run(registro.responder("mi-agente", "q", "c1"))
+    monkeypatch.setattr(registro.AGENTES["agente-ale-ubi"], "grafo", Grafo())
+    t = asyncio.run(registro.responder("agente-ale-ubi", "q", "c1"))
     assert t.startswith("La concentración es 35%") and "se cortó por el límite" in t
 
 
@@ -94,8 +94,8 @@ def test_una_respuesta_completa_no_lleva_aviso(monkeypatch):
     class Grafo:
         async def ainvoke(self, entrada, cfg):
             return {"messages": [HumanMessage(content="q"), AIMessage(content="ok", response_metadata={"stop_reason": "end_turn"})]}
-    monkeypatch.setattr(registro.AGENTES["mi-agente"], "grafo", Grafo())
-    assert asyncio.run(registro.responder("mi-agente", "q", "c1")) == "ok"
+    monkeypatch.setattr(registro.AGENTES["agente-ale-ubi"], "grafo", Grafo())
+    assert asyncio.run(registro.responder("agente-ale-ubi", "q", "c1")) == "ok"
 
 
 # ── configuración de modelos y modo económico ──

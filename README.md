@@ -15,6 +15,7 @@ Taller *Implementa y entrega tu agente* (Agentic AI · Curso 2). Este repositori
 
 | Endpoint | Acceso | Descripción |
 |---|---|---|
+| `GET /` | público | Ficha visual del agente (para personas) |
 | `GET /salud` | público | Estado del servicio y `url_publica` |
 | `GET /.well-known/agent-card.json` | público | Ficha A2A: qué hace, qué no, habilidades, URL y esquema de seguridad |
 | `POST /a2a` | **clave** | A2A `message/send` (JSON-RPC). El `contextId` es la memoria de la conversación |
@@ -94,7 +95,7 @@ docente la URL y la clave **por una vía privada**.
 El coordinador registra la URL de la ficha (`<URL_PUBLICA>/.well-known/agent-card.json`) y la clave del agente, lee `skills` y
 `description` para decidir cuándo derivarme una pregunta, y envía `message/send` a `<URL_PUBLICA>/a2a` con `X-API-Key`. Las
 respuestas del agente conservan cifras, unidades, fechas y supuestos tal como los entregan las herramientas, para que el
-coordinador las integre sin cambiarlas y atribuyéndolas a `mi-agente`.
+coordinador las integre sin cambiarlas y atribuyéndolas a `agente-ale-ubi`.
 
 ## Límites conocidos
 - Datos SII/CMF/fondos **simulados**; el agente solo recomienda.

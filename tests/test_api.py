@@ -21,7 +21,7 @@ def jsonrpc(texto, ctx=None):
 # ── público ──
 def test_salud_publica():
     j = client.get("/salud").json()
-    assert j["status"] == "ok" and j["agente"] == "mi-agente" and j["acceso_configurado"] is True
+    assert j["status"] == "ok" and j["agente"] == "agente-ale-ubi" and j["acceso_configurado"] is True
     assert j["url_publica"] == config.URL_PUBLICA
 
 
@@ -35,15 +35,15 @@ def test_swagger_y_rutas():
 # ── ficha ──
 def test_ficha_publica_dice_que_hace_y_que_no_y_declara_seguridad():
     card = client.get("/.well-known/agent-card.json").json()
-    assert card["name"] == "mi-agente" and card["skills"] and "apiKey" in card["securitySchemes"]
+    assert card["name"] == "agente-ale-ubi" and card["skills"] and "apiKey" in card["securitySchemes"]
     assert "ALCANCE" in card["description"] and "no ejecuta" in card["description"]
     assert card["supportedInterfaces"][0]["url"] == f"{config.URL_PUBLICA}/a2a"
 
 
 def test_la_ficha_publica_la_url_publica_configurada(monkeypatch):
-    monkeypatch.setenv("URL_PUBLICA", "https://mi-agente.example.com/")
+    monkeypatch.setenv("URL_PUBLICA", "https://agente-ale-ubi.example.com/")
     try:
-        assert importlib.reload(config).URL_PUBLICA == "https://mi-agente.example.com"
+        assert importlib.reload(config).URL_PUBLICA == "https://agente-ale-ubi.example.com"
     finally:
         monkeypatch.undo()
         importlib.reload(config)
@@ -98,3 +98,10 @@ def test_la_clave_de_ejemplo_publica_no_se_acepta(monkeypatch):
     finally:
         monkeypatch.undo()
         importlib.reload(config)
+
+
+def test_ficha_visual_publica_sin_secretos():
+    r = client.get("/")
+    assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+    assert "Qué NO hace" in r.text and "consultar_cmf" in r.text and "/.well-known/agent-card.json" in r.text
+    assert "clave-de-prueba" not in r.text and "sk-ant" not in r.text

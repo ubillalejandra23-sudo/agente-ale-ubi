@@ -12,7 +12,7 @@ def _si(nombre: str) -> bool:
     return (os.environ.get(nombre) or "").strip().lower() in ("1", "true", "si", "sí", "yes", "on")
 
 
-AGENT_ID = "mi-agente"
+AGENT_ID = "agente-ale-ubi"
 # Modo económico: Haiku y topes más bajos (útil para desarrollar y probar sin gastar de más).
 ECONOMICO = _si("ECONOMICO")
 MODELO_BARATO = "claude-haiku-5-5"
